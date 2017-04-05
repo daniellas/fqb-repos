@@ -19,5 +19,9 @@ public interface FqbRepository<E, I> {
     boolean remove(I id);
 
     long remove(Collection<I> ids);
+    
+    long countAll();
+
+    long countDistinct();
 
 }

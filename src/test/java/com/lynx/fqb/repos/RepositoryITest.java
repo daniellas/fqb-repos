@@ -3,6 +3,7 @@ package com.lynx.fqb.repos;
 import static org.hamcrest.collection.IsEmptyCollection.*;
 import static org.hamcrest.core.Is.*;
 import static org.hamcrest.core.IsNot.*;
+import static org.hamcrest.core.IsNull.*;
 
 import java.util.Arrays;
 
@@ -34,6 +35,16 @@ public class RepositoryITest extends IntegrationTestBase {
     }
 
     @Test
+    public void shouldCountAll() {
+        Assert.assertThat(repo.countAll(), is(not(nullValue())));
+    }
+
+    @Test
+    public void shouldCountDistinct() {
+        Assert.assertThat(repo.countDistinct(), is(not(nullValue())));
+    }
+
+    @Test
     public void shouldGetOne() {
         Assert.assertThat(repo.getOne(1l).get().getId(), is(1l));
     }
@@ -62,6 +73,11 @@ public class RepositoryITest extends IntegrationTestBase {
         TransactionalExecutor.using(em).run(() -> {
             Assert.assertEquals(2, repo.remove(Arrays.asList(entity1.getId(), entity2.getId())));
         });
+    }
+
+    @Test
+    public void shouldNotRemove() {
+        Assert.assertThat(repo.remove(-1l), is(false));
     }
 
 }

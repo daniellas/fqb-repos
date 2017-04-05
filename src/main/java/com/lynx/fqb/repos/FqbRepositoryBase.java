@@ -1,5 +1,8 @@
 package com.lynx.fqb.repos;
 
+import static com.lynx.fqb.expression.Expressions.*;
+import static com.lynx.fqb.select.Selections.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +14,7 @@ import com.lynx.fqb.Find;
 import com.lynx.fqb.Persist;
 import com.lynx.fqb.Remove;
 import com.lynx.fqb.Select;
+import com.lynx.fqb.expression.Expressions;
 import com.lynx.fqb.repos.page.DefaultPage;
 import com.lynx.fqb.repos.page.Page;
 
@@ -25,6 +29,10 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     protected abstract I entityId(E entity);
 
+    protected Select createSelect() {
+        return new Select();
+    }
+
     // TODO Decide on Persist vs Merge
     @Override
     public E save(E entity) {
@@ -36,10 +44,9 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
         return Select.from(entityCls).getResultList(em);
     }
 
-    // TODO Implement total
     @Override
     public Page<E> findAll(int offset, int limit) {
-        return DefaultPage.of(offset, limit, 0, Select.from(entityCls).getResultList(em, offset, limit));
+        return DefaultPage.of(offset, limit, countAll(), createSelect().fromEntity(entityCls).getResultList(em, offset, limit));
     }
 
     @Override
@@ -67,4 +74,23 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
                 .filter(r -> r)
                 .collect(Collectors.counting());
     }
+
+    @Override
+    public long countAll() {
+        return createSelect().asCustom(Long.class)
+                .from(entityCls)
+                .with(of(expr(count(entityCls))))
+                .getSingleResult(em)
+                .get();
+    }
+
+    @Override
+    public long countDistinct() {
+        return createSelect().asCustom(Long.class)
+                .from(entityCls)
+                .with(of(expr(Expressions.countDistinct(entityCls))))
+                .getSingleResult(em)
+                .get();
+    }
+
 }
