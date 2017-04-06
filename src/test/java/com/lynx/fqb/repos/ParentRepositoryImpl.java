@@ -1,5 +1,7 @@
 package com.lynx.fqb.repos;
 
+import java.util.function.Function;
+
 import javax.persistence.EntityManager;
 
 import com.lynx.fqb.entity.Parent;
@@ -11,9 +13,8 @@ public class ParentRepositoryImpl extends FqbRepositoryBase<Parent, Long> implem
     }
 
     @Override
-    protected Long entityId(Parent entity) {
-        return entity.getId();
+    protected Function<Parent, Long> entityId() {
+        return Parent::getId;
     }
-
 
 }

@@ -6,6 +6,7 @@ import static com.lynx.fqb.select.Selections.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +19,7 @@ import com.lynx.fqb.Remove;
 import com.lynx.fqb.Select;
 import com.lynx.fqb.expression.Expressions;
 import com.lynx.fqb.order.Orders;
+import com.lynx.fqb.predicate.PredicatesInterceptor;
 import com.lynx.fqb.repos.page.DefaultPage;
 import com.lynx.fqb.repos.page.Page;
 import com.lynx.fqb.repos.sort.Sort;
@@ -31,15 +33,19 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     protected final Class<E> entityCls;
 
-    protected abstract I entityId(E entity);
+    protected abstract Function<E, I> entityId();
 
-    protected Select createSelect() {
-        return new Select();
+    protected PredicatesInterceptor<E> predicatesInterceptor() {
+        return PredicatesInterceptor.identity();
+    }
+
+    protected Select<E> createSelect() {
+        return new Select<>(predicatesInterceptor());
     }
 
     @Override
     public E save(E entity) {
-        return Optional.ofNullable(entityId(entity))
+        return Optional.ofNullable(entityId().apply(entity))
                 .map(id -> {
                     return Merge.entity(entity).apply(em);
                 })
@@ -55,20 +61,20 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public List<E> findAll(Sort<E> sort) {
-        return createSelect().fromEntity(entityCls)
+        return createSelect().fromIntercepting(entityCls)
                 .orderBy(Orders.of(sort.toOrders()))
                 .getResultList(em);
     }
 
     @Override
     public Page<E> findAll(int offset, int limit) {
-        return DefaultPage.of(offset, limit, countAll(), createSelect().fromEntity(entityCls).getResultList(em, offset, limit));
+        return DefaultPage.of(offset, limit, countAll(), createSelect().fromIntercepting(entityCls).getResultList(em, offset, limit));
     }
 
     @Override
     public Page<E> findAll(Sort<E> sort, int offset, int limit) {
         return DefaultPage.of(offset, limit, countAll(),
-                createSelect().fromEntity(entityCls).orderBy(Orders.of(sort.toOrders()))
+                createSelect().fromIntercepting(entityCls).orderBy(Orders.of(sort.toOrders()))
                         .getResultList(em, offset, limit));
     }
 
@@ -108,8 +114,8 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public long countAll() {
-        return createSelect().asCustom(Long.class)
-                .from(entityCls)
+        return createSelect()
+                .customFromIntercepting(Long.class, entityCls)
                 .with(of(expr(count(entityCls))))
                 .getSingleResult(em)
                 .get();
@@ -117,8 +123,8 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public long countDistinct() {
-        return createSelect().asCustom(Long.class)
-                .from(entityCls)
+        return createSelect()
+                .customFromIntercepting(Long.class, entityCls)
                 .with(of(expr(Expressions.countDistinct(entityCls))))
                 .getSingleResult(em)
                 .get();

@@ -76,6 +76,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>3.7.4</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
