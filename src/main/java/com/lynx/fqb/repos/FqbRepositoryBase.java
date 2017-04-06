@@ -55,6 +55,15 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
     }
 
     @Override
+    public E saveAndFlush(E entity) {
+        E result = save(entity);
+
+        em.flush();
+
+        return result;
+    }
+
+    @Override
     public List<E> findAll() {
         return Select.from(entityCls).getResultList(em);
     }

@@ -32,6 +32,8 @@ public interface FqbRepository<E, I> {
      */
     E save(E entity);
 
+    E saveAndFlush(E entity);
+
     List<E> findAll();
 
     List<E> findAll(Sort<E> sort);

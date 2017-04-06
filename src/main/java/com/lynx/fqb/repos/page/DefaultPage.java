@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(staticName = "of")
 public class DefaultPage<T> implements Page<T> {
 
-    private static final int FIRST_PAGE_IDX = 1;
+    private static final int FIRST_PAGE_IDX = 0;
 
     @Getter
     private final int offset;
