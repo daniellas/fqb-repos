@@ -1,18 +1,15 @@
 package com.lynx.fqb.repos;
 
+import static org.hamcrest.core.Is.*;
+import static org.hamcrest.core.IsCollectionContaining.*;
+
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.lynx.fqb.repos.page.DefaultPage;
 import com.lynx.fqb.repos.page.Page;
-
-import static org.hamcrest.collection.IsEmptyCollection.*;
-import static org.hamcrest.core.IsCollectionContaining.*;
-import static org.hamcrest.core.Is.*;
-import static org.hamcrest.core.IsNot.*;
-import static org.hamcrest.core.IsNull.*;
-
-import java.util.Arrays;
 
 public class DefaultPageTest {
 

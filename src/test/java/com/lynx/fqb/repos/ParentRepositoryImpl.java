@@ -15,4 +15,5 @@ public class ParentRepositoryImpl extends FqbRepositoryBase<Parent, Long> implem
         return entity.getId();
     }
 
+
 }

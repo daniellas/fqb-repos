@@ -13,6 +13,9 @@ import org.junit.Test;
 
 import com.lynx.fqb.IntegrationTestBase;
 import com.lynx.fqb.entity.Parent;
+import com.lynx.fqb.entity.Parent_;
+import com.lynx.fqb.repos.sort.Sort;
+import com.lynx.fqb.repos.sort.Sort.Direction;
 import com.lynx.fqb.transaction.TransactionalExecutor;
 
 public class RepositoryITest extends IntegrationTestBase {
@@ -76,8 +79,38 @@ public class RepositoryITest extends IntegrationTestBase {
     }
 
     @Test
+    public void shouldSaveThanRemoveParallelByIdCollection() {
+        Parent entity1 = TransactionalExecutor.using(em).get(() -> {
+            return repo.save(new Parent());
+        });
+
+        Parent entity2 = TransactionalExecutor.using(em).get(() -> {
+            return repo.save(new Parent());
+        });
+
+        TransactionalExecutor.using(em).run(() -> {
+            Assert.assertEquals(2, repo.removeParallel(Arrays.asList(entity1.getId(), entity2.getId())));
+        });
+    }
+
+    @Test
     public void shouldNotRemove() {
         Assert.assertThat(repo.remove(-1l), is(false));
+    }
+
+    @Test
+    public void shouldSortAsc() {
+        repo.findAll(Sort.by(Direction.ASC, Parent_.name));
+    }
+
+    @Test
+    public void shouldSortDesc() {
+        repo.findAll(Sort.by(Direction.DESC, Parent_.name));
+    }
+
+    @Test
+    public void shouldSortByMultipleProperties() {
+        repo.findAll(Sort.by(Direction.ASC, Parent_.name).thenBy(Direction.ASC, Parent_.id));
     }
 
 }

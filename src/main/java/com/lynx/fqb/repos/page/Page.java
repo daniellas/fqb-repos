@@ -11,4 +11,8 @@ public interface Page<T> {
     long getTotal();
 
     List<T> getContent();
+
+    public static int offset(int firstPageIdx, int page, int limit) {
+        return (page - firstPageIdx) * limit;
+    }
 }

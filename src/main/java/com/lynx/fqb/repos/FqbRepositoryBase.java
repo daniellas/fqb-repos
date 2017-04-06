@@ -7,25 +7,29 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 
 import com.lynx.fqb.Find;
+import com.lynx.fqb.Merge;
 import com.lynx.fqb.Persist;
 import com.lynx.fqb.Remove;
 import com.lynx.fqb.Select;
 import com.lynx.fqb.expression.Expressions;
+import com.lynx.fqb.order.Orders;
 import com.lynx.fqb.repos.page.DefaultPage;
 import com.lynx.fqb.repos.page.Page;
+import com.lynx.fqb.repos.sort.Sort;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
-    private final EntityManager em;
+    protected final EntityManager em;
 
-    private final Class<E> entityCls;
+    protected final Class<E> entityCls;
 
     protected abstract I entityId(E entity);
 
@@ -33,10 +37,15 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
         return new Select();
     }
 
-    // TODO Decide on Persist vs Merge
     @Override
     public E save(E entity) {
-        return Persist.entity(entity).apply(em);
+        return Optional.ofNullable(entityId(entity))
+                .map(id -> {
+                    return Merge.entity(entity).apply(em);
+                })
+                .orElseGet(() -> {
+                    return Persist.entity(entity).apply(em);
+                });
     }
 
     @Override
@@ -45,8 +54,22 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
     }
 
     @Override
+    public List<E> findAll(Sort<E> sort) {
+        return createSelect().fromEntity(entityCls)
+                .orderBy(Orders.of(sort.toOrders()))
+                .getResultList(em);
+    }
+
+    @Override
     public Page<E> findAll(int offset, int limit) {
         return DefaultPage.of(offset, limit, countAll(), createSelect().fromEntity(entityCls).getResultList(em, offset, limit));
+    }
+
+    @Override
+    public Page<E> findAll(Sort<E> sort, int offset, int limit) {
+        return DefaultPage.of(offset, limit, countAll(),
+                createSelect().fromEntity(entityCls).orderBy(Orders.of(sort.toOrders()))
+                        .getResultList(em, offset, limit));
     }
 
     @Override
@@ -67,12 +90,20 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
         return false;
     }
 
-    @Override
-    public long remove(Collection<I> ids) {
-        return ids.stream()
-                .map(i -> remove(i))
+    private long remove(Stream<I> ids) {
+        return ids.map(i -> remove(i))
                 .filter(r -> r)
                 .collect(Collectors.counting());
+    }
+
+    @Override
+    public long remove(Collection<I> ids) {
+        return remove(ids.stream());
+    }
+
+    @Override
+    public long removeParallel(Collection<I> ids) {
+        return remove(ids.parallelStream());
     }
 
     @Override
