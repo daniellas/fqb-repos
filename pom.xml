@@ -11,6 +11,14 @@
 
     <dependencies>
 
+        <!-- JPA API -->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- FQB -->
         <dependency>
             <groupId>com.lynx.fqb</groupId>
@@ -218,6 +226,7 @@
                         </configuration>
                         <executions>
                             <execution>
+                                <phase>integration-test</phase>
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>

@@ -46,12 +46,18 @@ public interface FqbRepository<E, I> {
 
     boolean remove(I id);
 
+    /**
+     * Remove entities by given ids
+     * 
+     * 
+     * @param ids
+     *            to remove
+     * @return number of removed entities
+     */
     long remove(Collection<I> ids);
-
-    long removeParallel(Collection<I> ids);
 
     long countAll();
 
     long countDistinct();
-
+    
 }

@@ -16,7 +16,6 @@ import com.lynx.fqb.Find;
 import com.lynx.fqb.Merge;
 import com.lynx.fqb.Persist;
 import com.lynx.fqb.Remove;
-import com.lynx.fqb.Select;
 import com.lynx.fqb.Select.InterceptingSelect;
 import com.lynx.fqb.expression.Expressions;
 import com.lynx.fqb.order.Orders;
@@ -36,9 +35,7 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     protected abstract Function<E, I> entityId();
 
-    protected PredicatesInterceptor<E> predicatesInterceptor() {
-        return PredicatesInterceptor.identity();
-    }
+    protected abstract PredicatesInterceptor<E> predicatesInterceptor();
 
     protected InterceptingSelect<E> createSelect() {
         return new InterceptingSelect<>(predicatesInterceptor());
@@ -66,7 +63,7 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public List<E> findAll() {
-        return Select.from(entityCls).getResultList(em);
+        return createSelect().from(entityCls).getResultList(em);
     }
 
     @Override
@@ -117,11 +114,6 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
     @Override
     public long remove(Collection<I> ids) {
         return remove(ids.stream());
-    }
-
-    @Override
-    public long removeParallel(Collection<I> ids) {
-        return remove(ids.parallelStream());
     }
 
     @Override
