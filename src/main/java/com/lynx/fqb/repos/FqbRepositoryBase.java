@@ -17,6 +17,7 @@ import com.lynx.fqb.Merge;
 import com.lynx.fqb.Persist;
 import com.lynx.fqb.Remove;
 import com.lynx.fqb.Select;
+import com.lynx.fqb.Select.InterceptingSelect;
 import com.lynx.fqb.expression.Expressions;
 import com.lynx.fqb.order.Orders;
 import com.lynx.fqb.predicate.PredicatesInterceptor;
@@ -39,8 +40,8 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
         return PredicatesInterceptor.identity();
     }
 
-    protected Select<E> createSelect() {
-        return new Select<>(predicatesInterceptor());
+    protected InterceptingSelect<E> createSelect() {
+        return new InterceptingSelect<>(predicatesInterceptor());
     }
 
     @Override
@@ -70,20 +71,22 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public List<E> findAll(Sort<E> sort) {
-        return createSelect().fromIntercepting(entityCls)
+        return createSelect().from(entityCls)
                 .orderBy(Orders.of(sort.toOrders()))
                 .getResultList(em);
     }
 
     @Override
     public Page<E> findAll(int offset, int limit) {
-        return DefaultPage.of(offset, limit, countAll(), createSelect().fromIntercepting(entityCls).getResultList(em, offset, limit));
+        return DefaultPage.of(offset, limit, countAll(),
+                createSelect().from(entityCls)
+                        .getResultList(em, offset, limit));
     }
 
     @Override
     public Page<E> findAll(Sort<E> sort, int offset, int limit) {
         return DefaultPage.of(offset, limit, countAll(),
-                createSelect().fromIntercepting(entityCls).orderBy(Orders.of(sort.toOrders()))
+                createSelect().from(entityCls).orderBy(Orders.of(sort.toOrders()))
                         .getResultList(em, offset, limit));
     }
 
@@ -124,7 +127,7 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
     @Override
     public long countAll() {
         return createSelect()
-                .customFromIntercepting(Long.class, entityCls)
+                .customFrom(Long.class, entityCls)
                 .with(of(expr(count(entityCls))))
                 .getSingleResult(em)
                 .get();
@@ -133,7 +136,7 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
     @Override
     public long countDistinct() {
         return createSelect()
-                .customFromIntercepting(Long.class, entityCls)
+                .customFrom(Long.class, entityCls)
                 .with(of(expr(Expressions.countDistinct(entityCls))))
                 .getSingleResult(em)
                 .get();
