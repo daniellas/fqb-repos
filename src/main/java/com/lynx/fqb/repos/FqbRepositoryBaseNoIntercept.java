@@ -17,7 +17,12 @@ public abstract class FqbRepositoryBaseNoIntercept<E, I> extends FqbRepositoryBa
     }
 
     @Override
-    protected EntityInterceptor<E> entityInterceptor() {
+    protected EntityInterceptor<E> entityPostInterceptor() {
+        return EntityInterceptor.noOp();
+    }
+
+    @Override
+    protected EntityInterceptor<E> entityPreInterceptor() {
         return EntityInterceptor.noOp();
     }
 

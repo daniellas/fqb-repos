@@ -29,9 +29,9 @@ public interface FqbRepository<E, I> {
      *            to save
      * @return saved entity
      */
-    E save(E entity);
+    Optional<E> save(E entity);
 
-    E saveAndFlush(E entity);
+    Optional<E> saveAndFlush(E entity);
 
     List<E> findAll();
 

@@ -58,7 +58,7 @@ public class RepositoryITest extends IntegrationTestBase {
     @Test
     public void shouldSaveThanRemove() {
         Parent entity = using(em).get(() -> {
-            return repo.save(new Parent());
+            return repo.save(new Parent()).get();
         });
 
         using(em).run(() -> {
@@ -69,7 +69,7 @@ public class RepositoryITest extends IntegrationTestBase {
     @Test
     public void shouldSaveThanRemoveById() {
         Parent entity = using(em).get(() -> {
-            return repo.save(new Parent());
+            return repo.save(new Parent()).get();
         });
 
         using(em).run(() -> {
@@ -80,11 +80,11 @@ public class RepositoryITest extends IntegrationTestBase {
     @Test
     public void shouldSaveThanRemoveByIdCollection() {
         Parent entity1 = using(em).get(() -> {
-            return repo.save(new Parent());
+            return repo.save(new Parent()).get();
         });
 
         Parent entity2 = using(em).get(() -> {
-            return repo.save(new Parent());
+            return repo.save(new Parent()).get();
         });
 
         using(em).run(() -> {

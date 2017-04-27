@@ -38,46 +38,48 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     protected abstract PredicatesInterceptor<E> predicatesInterceptor();
 
-    protected abstract EntityInterceptor<E> entityInterceptor();
+    protected abstract EntityInterceptor<E> entityPostInterceptor();
+
+    protected abstract EntityInterceptor<E> entityPreInterceptor();
 
     protected InterceptingSelect<E> select() {
         return new InterceptingSelect<>(predicatesInterceptor());
     }
 
     protected InterceptingFind<E> find() {
-        return new InterceptingFind<>(entityInterceptor());
+        return new InterceptingFind<>(entityPostInterceptor());
     }
 
     protected InterceptingRemove<E> remove() {
-        return new InterceptingRemove<>(entityInterceptor());
+        return new InterceptingRemove<>(entityPreInterceptor());
     }
 
     protected InterceptingMerge<E> merge() {
-        return new InterceptingMerge<>(entityInterceptor());
+        return new InterceptingMerge<>(entityPreInterceptor());
     }
 
     protected InterceptingPersist<E> persist() {
-        return new InterceptingPersist<>(entityInterceptor());
+        return new InterceptingPersist<>(entityPreInterceptor());
     }
 
     @Override
-    public E save(E entity) {
+    public Optional<E> save(E entity) {
         return Optional.ofNullable(entityId().apply(entity))
                 .map(id -> {
-                    return merge().entity(entity).andThen(Optional::get).apply(em);
+                    return merge().entity(entity).apply(em);
                 })
                 .orElseGet(() -> {
-                    return persist().entity(entity).andThen(Optional::get).apply(em);
+                    return persist().entity(entity).apply(em);
                 });
     }
 
     @Override
-    public E saveAndFlush(E entity) {
-        E result = save(entity);
+    public Optional<E> saveAndFlush(E entity) {
+        return save(entity).map(e -> {
+            em.flush();
 
-        em.flush();
-
-        return result;
+            return e;
+        });
     }
 
     @Override
