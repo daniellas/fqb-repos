@@ -56,13 +56,24 @@ public class RepositoryITest extends IntegrationTestBase {
     }
 
     @Test
+    public void shouldSaveThanRemove() {
+        Parent entity = using(em).get(() -> {
+            return repo.save(new Parent());
+        });
+
+        using(em).run(() -> {
+            assertTrue(repo.remove(entity));
+        });
+    }
+
+    @Test
     public void shouldSaveThanRemoveById() {
         Parent entity = using(em).get(() -> {
             return repo.save(new Parent());
         });
 
         using(em).run(() -> {
-            assertTrue(repo.remove(entity.getId()));
+            assertTrue(repo.removeById(entity.getId()));
         });
     }
 
@@ -77,13 +88,13 @@ public class RepositoryITest extends IntegrationTestBase {
         });
 
         using(em).run(() -> {
-            assertEquals(2, repo.remove(Arrays.asList(entity1.getId(), entity2.getId())));
+            assertEquals(2, repo.removeByIds(Arrays.asList(entity1.getId(), entity2.getId())));
         });
     }
 
     @Test
     public void shouldNotRemove() {
-        assertThat(repo.remove(-1l), is(false));
+        assertThat(repo.removeById(-1l), is(false));
     }
 
     @Test

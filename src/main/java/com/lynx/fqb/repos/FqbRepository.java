@@ -22,9 +22,8 @@ import com.lynx.fqb.repos.sort.Sort;
  */
 public interface FqbRepository<E, I> {
 
-    // TODO Update after deciding on persist vs merge
     /**
-     * Performs persist or merge depending on ...
+     * Performs persist or merge depending on entity id value
      * 
      * @param entity
      *            to save
@@ -44,20 +43,22 @@ public interface FqbRepository<E, I> {
 
     Optional<E> getOne(I id);
 
-    boolean remove(I id);
+    boolean remove(E entity);
+
+    boolean removeById(I id);
 
     /**
-     * Remove entities by given ids
+     * Remove entities by given identifiers
      * 
      * 
      * @param ids
      *            to remove
      * @return number of removed entities
      */
-    long remove(Collection<I> ids);
+    long removeByIds(Collection<I> ids);
 
     long countAll();
 
     long countDistinct();
-    
+
 }

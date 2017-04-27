@@ -12,12 +12,13 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 
-import com.lynx.fqb.Find;
+import com.lynx.fqb.Find.InterceptingFind;
 import com.lynx.fqb.Merge;
 import com.lynx.fqb.Persist;
-import com.lynx.fqb.Remove;
+import com.lynx.fqb.Remove.InterceptingRemove;
 import com.lynx.fqb.Select.InterceptingSelect;
 import com.lynx.fqb.expression.Expressions;
+import com.lynx.fqb.intercept.EntityInterceptor;
 import com.lynx.fqb.order.Orders;
 import com.lynx.fqb.predicate.PredicatesInterceptor;
 import com.lynx.fqb.repos.page.DefaultPage;
@@ -37,8 +38,18 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     protected abstract PredicatesInterceptor<E> predicatesInterceptor();
 
-    protected InterceptingSelect<E> createSelect() {
+    protected abstract EntityInterceptor<E> entityInterceptor();
+
+    protected InterceptingSelect<E> select() {
         return new InterceptingSelect<>(predicatesInterceptor());
+    }
+
+    protected InterceptingFind<E> find() {
+        return new InterceptingFind<>(entityInterceptor());
+    }
+
+    protected InterceptingRemove<E> remove() {
+        return new InterceptingRemove<>(entityInterceptor());
     }
 
     @Override
@@ -63,12 +74,12 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public List<E> findAll() {
-        return createSelect().from(entityCls).getResultList(em);
+        return select().from(entityCls).getResultList(em);
     }
 
     @Override
     public List<E> findAll(Sort<E> sort) {
-        return createSelect().from(entityCls)
+        return select().from(entityCls)
                 .orderBy(Orders.of(sort.toOrders()))
                 .getResultList(em);
     }
@@ -76,49 +87,49 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
     @Override
     public Page<E> findAll(int offset, int limit) {
         return DefaultPage.of(offset, limit, countAll(),
-                createSelect().from(entityCls)
+                select().from(entityCls)
                         .getResultList(em, offset, limit));
     }
 
     @Override
     public Page<E> findAll(Sort<E> sort, int offset, int limit) {
         return DefaultPage.of(offset, limit, countAll(),
-                createSelect().from(entityCls).orderBy(Orders.of(sort.toOrders()))
+                select().from(entityCls).orderBy(Orders.of(sort.toOrders()))
                         .getResultList(em, offset, limit));
     }
 
     @Override
     public Optional<E> getOne(I id) {
-        return Find.entity(entityCls).byId(id).apply(em);
+        return find().entity(entityCls).byId(id).apply(em);
     }
 
     @Override
-    public boolean remove(I id) {
-        Optional<E> entity = Find.entity(entityCls).byId(id).apply(em);
+    public boolean remove(E entity) {
+        return remove().entity(entity).apply(em);
+    }
 
-        if (entity.isPresent()) {
-            Remove.entity(entity.get()).accept(em);
-
-            return true;
-        }
-
-        return false;
+    @Override
+    public boolean removeById(I id) {
+        return find().entity(entityCls).byId(id)
+                .andThen(e -> {
+                    return e.map(this::remove).orElse(false);
+                }).apply(em);
     }
 
     private long remove(Stream<I> ids) {
-        return ids.map(i -> remove(i))
+        return ids.map(this::removeById)
                 .filter(r -> r)
                 .collect(Collectors.counting());
     }
 
     @Override
-    public long remove(Collection<I> ids) {
+    public long removeByIds(Collection<I> ids) {
         return remove(ids.stream());
     }
 
     @Override
     public long countAll() {
-        return createSelect()
+        return select()
                 .customFrom(Long.class, entityCls)
                 .with(of(expr(count(entityCls))))
                 .getSingleResult(em)
@@ -127,7 +138,7 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
 
     @Override
     public long countDistinct() {
-        return createSelect()
+        return select()
                 .customFrom(Long.class, entityCls)
                 .with(of(expr(Expressions.countDistinct(entityCls))))
                 .getSingleResult(em)

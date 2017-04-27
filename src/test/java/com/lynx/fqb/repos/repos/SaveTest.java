@@ -22,7 +22,7 @@ public class SaveTest extends ReposMockTestBase {
 
     @Test
     public void shoulMergeEntityWithId() {
-        repo.save(new Parent(1l, null, null));
+        repo.save(new Parent(1l, null, null, null));
 
         Mockito.verify(em).merge(Mockito.any());
     }
