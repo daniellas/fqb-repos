@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 
 import com.lynx.fqb.Find.InterceptingFind;
-import com.lynx.fqb.Merge;
-import com.lynx.fqb.Persist;
+import com.lynx.fqb.Merge.InterceptingMerge;
+import com.lynx.fqb.Persist.InterceptingPersist;
 import com.lynx.fqb.Remove.InterceptingRemove;
 import com.lynx.fqb.Select.InterceptingSelect;
 import com.lynx.fqb.expression.Expressions;
@@ -52,14 +52,22 @@ public abstract class FqbRepositoryBase<E, I> implements FqbRepository<E, I> {
         return new InterceptingRemove<>(entityInterceptor());
     }
 
+    protected InterceptingMerge<E> merge() {
+        return new InterceptingMerge<>(entityInterceptor());
+    }
+
+    protected InterceptingPersist<E> persist() {
+        return new InterceptingPersist<>(entityInterceptor());
+    }
+
     @Override
     public E save(E entity) {
         return Optional.ofNullable(entityId().apply(entity))
                 .map(id -> {
-                    return Merge.entity(entity).apply(em);
+                    return merge().entity(entity).andThen(Optional::get).apply(em);
                 })
                 .orElseGet(() -> {
-                    return Persist.entity(entity).apply(em);
+                    return persist().entity(entity).andThen(Optional::get).apply(em);
                 });
     }
 
