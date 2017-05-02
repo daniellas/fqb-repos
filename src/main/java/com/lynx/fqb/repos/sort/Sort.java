@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.SingularAttribute;
 
 import com.lynx.fqb.order.Orders;
@@ -26,7 +26,7 @@ public class Sort<R> {
         ASC, DESC
     }
 
-    private BiFunction<CriteriaBuilder, Root<R>, Order> toOrder(DirectionAttribute<R> property) {
+    private BiFunction<CriteriaBuilder, Path<R>, Order> toOrder(DirectionAttribute<R> property) {
         if (property.getDirection() == Direction.ASC) {
             return Orders.asc(Paths.get(property.getAttr()));
         }
@@ -35,8 +35,8 @@ public class Sort<R> {
     }
 
     @SuppressWarnings("unchecked")
-    public BiFunction<CriteriaBuilder, Root<R>, Order>[] toOrders() {
-        return (BiFunction<CriteriaBuilder, Root<R>, Order>[]) properties.stream().map(this::toOrder).toArray(BiFunction[]::new);
+    public BiFunction<CriteriaBuilder, Path<R>, Order>[] toOrders() {
+        return (BiFunction<CriteriaBuilder, Path<R>, Order>[]) properties.stream().map(this::toOrder).toArray(BiFunction[]::new);
     }
 
     public static <R> Sort<R> by(Direction direction, SingularAttribute<? super R, ?> attr) {
