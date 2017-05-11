@@ -43,6 +43,8 @@ public interface FqbRepository<E, I> {
 
     Optional<E> getOne(I id);
 
+    E findOne(I id);
+
     boolean remove(E entity);
 
     boolean removeById(I id);

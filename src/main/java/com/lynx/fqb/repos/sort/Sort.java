@@ -3,6 +3,7 @@ package com.lynx.fqb.repos.sort;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -23,7 +24,11 @@ public class Sort<R> {
     private final List<DirectionAttribute<R>> properties;
 
     public enum Direction {
-        ASC, DESC
+        ASC, DESC;
+
+        public static Direction fromString(String value) {
+            return valueOf(Optional.ofNullable(value).map(String::toUpperCase).orElseThrow(NullPointerException::new));
+        }
     }
 
     private BiFunction<CriteriaBuilder, Path<? extends R>, Order> toOrder(DirectionAttribute<R> property) {
@@ -41,6 +46,10 @@ public class Sort<R> {
 
     public static <R> Sort<R> by(Direction direction, SingularAttribute<? super R, ?> attr) {
         return new Sort<>(Arrays.asList(DirectionAttribute.of(direction, attr)));
+    }
+
+    public static <R> Sort<R> by(String direction, SingularAttribute<? super R, ?> attr) {
+        return by(Direction.fromString(direction), attr);
     }
 
     public Sort<R> thenBy(Direction direction, SingularAttribute<? super R, ?> attr) {

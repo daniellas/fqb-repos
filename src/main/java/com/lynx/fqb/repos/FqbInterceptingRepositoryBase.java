@@ -114,6 +114,11 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
     }
 
     @Override
+    public E findOne(I id) {
+        return getOne(id).orElse(null);
+    }
+
+    @Override
     public boolean remove(E entity) {
         return remove().entity(entity).apply(em);
     }
