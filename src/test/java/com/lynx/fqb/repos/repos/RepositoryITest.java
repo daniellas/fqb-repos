@@ -88,7 +88,7 @@ public class RepositoryITest extends IntegrationTestBase {
         });
 
         using(em).run(() -> {
-            assertEquals(2, repo.removeByIds(Arrays.asList(entity1.getId(), entity2.getId())));
+            assertEquals(2, repo.removeById(Arrays.asList(entity1.getId(), entity2.getId())));
         });
     }
 

@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -124,6 +123,14 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
     }
 
     @Override
+    public long remove(Collection<E> entities) {
+        return entities.stream()
+                .map(this::remove)
+                .filter(r -> r)
+                .count();
+    }
+
+    @Override
     public boolean removeById(I id) {
         return find().entity(entityCls).byId(id)
                 .andThen(e -> {
@@ -134,11 +141,11 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
     private long remove(Stream<I> ids) {
         return ids.map(this::removeById)
                 .filter(r -> r)
-                .collect(Collectors.counting());
+                .count();
     }
 
     @Override
-    public long removeByIds(Collection<I> ids) {
+    public long removeById(Collection<I> ids) {
         return remove(ids.stream());
     }
 

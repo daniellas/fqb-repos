@@ -45,7 +45,9 @@ public interface FqbRepository<E, I> {
 
     E findOne(I id);
 
-    boolean remove(E entity);
+    boolean remove(E entities);
+
+    long remove(Collection<E> entity);
 
     boolean removeById(I id);
 
@@ -57,7 +59,7 @@ public interface FqbRepository<E, I> {
      *            to remove
      * @return number of removed entities
      */
-    long removeByIds(Collection<I> ids);
+    long removeById(Collection<I> ids);
 
     long countAll();
 
