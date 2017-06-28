@@ -41,18 +41,19 @@ public class Sort<R> {
 
     @SuppressWarnings("unchecked")
     public BiFunction<CriteriaBuilder, Path<? extends R>, Order>[] toOrders() {
-        return (BiFunction<CriteriaBuilder, Path<? extends R>, Order>[]) properties.stream().map(this::toOrder).toArray(BiFunction[]::new);
+        return (BiFunction<CriteriaBuilder, Path<? extends R>, Order>[]) properties.stream().map(this::toOrder)
+                .toArray(BiFunction[]::new);
     }
 
-    public static <R> Sort<R> by(Direction direction, SingularAttribute<? super R, ?> attr) {
+    public static <R> Sort<R> by(Direction direction, SingularAttribute<R, ?> attr) {
         return new Sort<>(Arrays.asList(DirectionAttribute.of(direction, attr)));
     }
 
-    public static <R> Sort<R> by(String direction, SingularAttribute<? super R, ?> attr) {
+    public static <R> Sort<R> by(String direction, SingularAttribute<R, ?> attr) {
         return by(Direction.fromString(direction), attr);
     }
 
-    public Sort<R> thenBy(Direction direction, SingularAttribute<? super R, ?> attr) {
+    public Sort<R> thenBy(Direction direction, SingularAttribute<R, ?> attr) {
         ArrayList<DirectionAttribute<R>> props = new ArrayList<>(properties);
 
         props.add(DirectionAttribute.of(direction, attr));
@@ -64,7 +65,7 @@ public class Sort<R> {
     @RequiredArgsConstructor(staticName = "of")
     private static class DirectionAttribute<R> {
         private final Direction direction;
-        private final SingularAttribute<? super R, ?> attr;
+        private final SingularAttribute<R, ?> attr;
     }
 
 }

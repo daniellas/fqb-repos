@@ -4,8 +4,8 @@
 
     <persistence-unit name="test">
 
-        <class>com.lynx.fqb.entity.Parent</class>
-        <class>com.lynx.fqb.entity.Child</class>
+        <class>com.lynx.fqb.entity.SellOrder</class>
+        <class>com.lynx.fqb.entity.Item</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
