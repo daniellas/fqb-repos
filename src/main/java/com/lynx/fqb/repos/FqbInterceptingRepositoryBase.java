@@ -1,7 +1,7 @@
 package com.lynx.fqb.repos;
 
 import static com.lynx.fqb.expression.Expressions.*;
-import static com.lynx.fqb.selection.Selections.*; 
+import static com.lynx.fqb.selection.Selections.*;
 
 import java.util.Collection;
 import java.util.List;

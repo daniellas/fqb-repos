@@ -43,7 +43,8 @@ public class Sort<R> {
 
     @SuppressWarnings("unchecked")
     public BiFunction<CriteriaBuilder, Path<? extends R>, Order>[] toOrders() {
-        return (BiFunction<CriteriaBuilder, Path<? extends R>, Order>[]) properties.stream().map(this::toOrder).toArray(BiFunction[]::new);
+        return (BiFunction<CriteriaBuilder, Path<? extends R>, Order>[]) properties.stream().map(this::toOrder)
+                .toArray(BiFunction[]::new);
     }
 
     public static <R> Sort<R> by(Direction direction, SingularAttribute<R, ?> attr) {

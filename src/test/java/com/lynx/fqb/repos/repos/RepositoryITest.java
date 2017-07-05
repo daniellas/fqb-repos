@@ -99,17 +99,21 @@ public class RepositoryITest extends IntegrationTestBase {
 
     @Test
     public void shouldSortAsc() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, SellOrder_.number))).getNumber(), is(IntegrationTestBase.ORDER_ONE_NUMBER));
+        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, SellOrder_.number))).getNumber(),
+                is(IntegrationTestBase.ORDER_ONE_NUMBER));
     }
 
     @Test
     public void shouldSortDesc() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.DESC, SellOrder_.number))).getNumber(), is(IntegrationTestBase.ORDER_TWO_NUMBER));
+        assertThat(firstElement(repo.findAll(Sort.by(Direction.DESC, SellOrder_.number))).getNumber(),
+                is(IntegrationTestBase.ORDER_TWO_NUMBER));
     }
 
     @Test
     public void shouldSortByMultipleProperties() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, SellOrder_.number).thenBy(Direction.ASC, SellOrder_.id))).getNumber(),
+        assertThat(firstElement(
+                repo.findAll(Sort.by(Direction.ASC, SellOrder_.number).thenBy(Direction.ASC, SellOrder_.id)))
+                        .getNumber(),
                 is(IntegrationTestBase.ORDER_ONE_NUMBER));
     }
 
