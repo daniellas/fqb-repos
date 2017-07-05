@@ -3,7 +3,7 @@ package com.lynx.fqb.repos;
 import javax.persistence.EntityManager;
 
 import com.lynx.fqb.intercept.EntityInterceptor;
-import com.lynx.fqb.predicate.PredicatesInterceptor;
+import com.lynx.fqb.intercept.PredicatesInterceptor;
 
 public abstract class FqbRepositoryBase<E, I> extends FqbInterceptingRepositoryBase<E, I> {
 

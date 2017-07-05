@@ -27,7 +27,9 @@ public class Sort<R> {
         ASC, DESC;
 
         public static Direction fromString(String value) {
-            return valueOf(Optional.ofNullable(value).map(String::toUpperCase).orElseThrow(NullPointerException::new));
+            return valueOf(Optional.ofNullable(value)
+                    .map(String::toUpperCase)
+                    .orElseThrow(() -> new IllegalArgumentException("Direction value may not be null")));
         }
     }
 
