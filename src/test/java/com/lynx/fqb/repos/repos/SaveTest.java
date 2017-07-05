@@ -4,32 +4,32 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 
-import com.lynx.fqb.entity.Parent;
+import com.lynx.fqb.entity.SellOrder;
 import com.lynx.fqb.repos.ReposMockTestBase;
-import com.lynx.fqb.repos.impl.ParentRepositoryImpl;
+import com.lynx.fqb.repos.impl.SellOrderRepositoryImpl;
 
 public class SaveTest extends ReposMockTestBase {
 
     @InjectMocks
-    private ParentRepositoryImpl repo;
+    private SellOrderRepositoryImpl repo;
 
     @Test
     public void shoulPersistEntityWithoutId() {
-        repo.save(new Parent());
+        repo.save(new SellOrder());
 
         Mockito.verify(em).persist(Mockito.any());
     }
 
     @Test
     public void shoulMergeEntityWithId() {
-        repo.save(new Parent(1l, null, null, null));
+        repo.save(new SellOrder(1l, null, null, null, null, null, null));
 
         Mockito.verify(em).merge(Mockito.any());
     }
 
     @Test
     public void shouldFlush() {
-        repo.saveAndFlush(new Parent());
+        repo.saveAndFlush(new SellOrder());
 
         Mockito.verify(em).flush();
     }

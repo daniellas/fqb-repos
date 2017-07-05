@@ -14,20 +14,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.lynx.fqb.IntegrationTestBase;
-import com.lynx.fqb.entity.Parent;
-import com.lynx.fqb.entity.Parent_;
-import com.lynx.fqb.repos.impl.ParentRepository;
-import com.lynx.fqb.repos.impl.ParentRepositoryImpl;
+import com.lynx.fqb.entity.SellOrder;
+import com.lynx.fqb.entity.SellOrder_;
+import com.lynx.fqb.repos.impl.SellOrderRepository;
+import com.lynx.fqb.repos.impl.SellOrderRepositoryImpl;
 import com.lynx.fqb.repos.sort.Sort;
 import com.lynx.fqb.repos.sort.Sort.Direction;
 
 public class RepositoryITest extends IntegrationTestBase {
 
-    private ParentRepository repo;
+    private SellOrderRepository repo;
 
     @Before
     public void initRepository() {
-        repo = new ParentRepositoryImpl(em, Parent.class);
+        repo = new SellOrderRepositoryImpl(em, SellOrder.class);
     }
 
     @Test
@@ -52,13 +52,13 @@ public class RepositoryITest extends IntegrationTestBase {
 
     @Test
     public void shouldGetOne() {
-        assertThat(repo.getOne(1l).get().getId(), is(1l));
+        assertThat(repo.getOne(IntegrationTestBase.ORDER_ONE_ID).get().getId(), is(IntegrationTestBase.ORDER_ONE_ID));
     }
 
     @Test
     public void shouldSaveThanRemove() {
-        Parent entity = using(em).get(() -> {
-            return repo.save(new Parent()).get();
+        SellOrder entity = using(em).get(() -> {
+            return repo.save(new SellOrder()).get();
         });
 
         using(em).run(() -> {
@@ -68,8 +68,8 @@ public class RepositoryITest extends IntegrationTestBase {
 
     @Test
     public void shouldSaveThanRemoveById() {
-        Parent entity = using(em).get(() -> {
-            return repo.save(new Parent()).get();
+        SellOrder entity = using(em).get(() -> {
+            return repo.save(new SellOrder()).get();
         });
 
         using(em).run(() -> {
@@ -79,12 +79,12 @@ public class RepositoryITest extends IntegrationTestBase {
 
     @Test
     public void shouldSaveThanRemoveByIdCollection() {
-        Parent entity1 = using(em).get(() -> {
-            return repo.save(new Parent()).get();
+        SellOrder entity1 = using(em).get(() -> {
+            return repo.save(new SellOrder()).get();
         });
 
-        Parent entity2 = using(em).get(() -> {
-            return repo.save(new Parent()).get();
+        SellOrder entity2 = using(em).get(() -> {
+            return repo.save(new SellOrder()).get();
         });
 
         using(em).run(() -> {
@@ -99,23 +99,24 @@ public class RepositoryITest extends IntegrationTestBase {
 
     @Test
     public void shouldSortAsc() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, Parent_.name))).getName(), is(IntegrationTestBase.PARENT_JOHN_NAME));
+        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, SellOrder_.number))).getNumber(), is(IntegrationTestBase.ORDER_ONE_NUMBER));
     }
 
     @Test
     public void shouldSortDesc() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.DESC, Parent_.name))).getName(), is(IntegrationTestBase.PARENT_MAX_NAME));
+        assertThat(firstElement(repo.findAll(Sort.by(Direction.DESC, SellOrder_.number))).getNumber(), is(IntegrationTestBase.ORDER_TWO_NUMBER));
     }
 
     @Test
     public void shouldSortByMultipleProperties() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, Parent_.name).thenBy(Direction.ASC, Parent_.id))).getName(),
-                is(IntegrationTestBase.PARENT_JOHN_NAME));
+        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, SellOrder_.number).thenBy(Direction.ASC, SellOrder_.id))).getNumber(),
+                is(IntegrationTestBase.ORDER_ONE_NUMBER));
     }
 
     @Test
     public void shouldSortAscPaged() {
-        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, Parent_.name), 0, 1).getContent()).getName(), is(IntegrationTestBase.PARENT_JOHN_NAME));
+        assertThat(firstElement(repo.findAll(Sort.by(Direction.ASC, SellOrder_.number), 0, 1).getContent()).getNumber(),
+                is(IntegrationTestBase.ORDER_ONE_NUMBER));
     }
 
     private <T> T firstElement(Collection<T> coll) {

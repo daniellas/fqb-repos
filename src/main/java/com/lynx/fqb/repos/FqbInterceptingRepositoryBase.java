@@ -1,7 +1,7 @@
 package com.lynx.fqb.repos;
 
 import static com.lynx.fqb.expression.Expressions.*;
-import static com.lynx.fqb.select.Selections.*;
+import static com.lynx.fqb.selection.Selections.*; 
 
 import java.util.Collection;
 import java.util.List;
@@ -155,7 +155,7 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
                 .customFrom(Long.class, entityCls)
                 .with(of(expr(count(entityCls))))
                 .getSingleResult(em)
-                .get();
+                .getResult();
     }
 
     @Override
@@ -164,7 +164,7 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
                 .customFrom(Long.class, entityCls)
                 .with(of(expr(Expressions.countDistinct(entityCls))))
                 .getSingleResult(em)
-                .get();
+                .getResult();
     }
 
 }
