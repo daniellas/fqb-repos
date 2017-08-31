@@ -112,8 +112,8 @@ public class RepositoryITest extends IntegrationTestBase {
     @Test
     public void shouldSortByMultipleProperties() {
         assertThat(firstElement(
-                repo.findAll(Sort.by(Direction.ASC, SellOrder_.number).thenBy(Direction.ASC, SellOrder_.id)))
-                        .getNumber(),
+                repo.findAll(Sort.by(Direction.ASC, SellOrder_.number)
+                        .thenBy(Direction.ASC, SellOrder_.id))).getNumber(),
                 is(IntegrationTestBase.ORDER_ONE_NUMBER));
     }
 
