@@ -64,12 +64,8 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
     @Override
     public Optional<E> save(E entity) {
         return Optional.ofNullable(entityId().apply(entity))
-                .map(id -> {
-                    return merge().entity(entity).apply(em);
-                })
-                .orElseGet(() -> {
-                    return persist().entity(entity).apply(em);
-                });
+                .map(id -> merge().entity(entity).apply(em))
+                .orElseGet(() -> persist().entity(entity).apply(em));
     }
 
     @Override
@@ -133,9 +129,8 @@ public abstract class FqbInterceptingRepositoryBase<E, I> implements FqbReposito
     @Override
     public boolean removeById(I id) {
         return find().entity(entityCls).byId(id)
-                .andThen(e -> {
-                    return e.map(this::remove).orElse(false);
-                }).apply(em);
+                .andThen(e -> e.map(this::remove).orElse(false))
+                .apply(em);
     }
 
     private long remove(Stream<I> ids) {
